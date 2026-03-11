@@ -1,3 +1,2 @@
-id,name,points,tier
-customer-001,Jan Novak,120,Gold
-customer-002,Eva Svobodova,85,Silver
+id,template_id,name,points,tier
+customer-003,9471859c-9f30-4e87-9047-015ec1295c05,Petr Novotny,200,Platinum
