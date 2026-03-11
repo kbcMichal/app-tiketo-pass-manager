@@ -13,35 +13,33 @@
     "action": {
       "type": "string",
       "title": "Action",
-      "description": "Select the action to perform",
-      "enum": [
-        "list_templates",
-        "list_passes",
-        "list_members",
-        "list_venues",
-        "list_organizations",
-        "list_campaigns",
-        "upsert_passes",
-        "delete_passes",
-        "upsert_members",
-        "delete_members",
-        "upsert_venues",
-        "delete_venues",
-        "add_venue_members",
-        "remove_venue_members",
-        "upsert_organizations",
-        "delete_organizations",
-        "move_organizations",
-        "add_organization_members",
-        "remove_organization_members",
-        "update_organization_member_roles",
-        "attach_entities_to_organizations",
-        "detach_entities_from_organizations",
-        "create_passes_campaign",
-        "create_template_campaign",
-        "archive_campaigns"
-      ],
+      "description": "Extract pulls all data from Tiketo. Write performs a specific operation on a chosen entity.",
+      "enum": ["extract", "write"],
+      "default": "extract",
       "propertyOrder": 2
+    },
+    "entity": {
+      "type": "string",
+      "title": "Entity",
+      "description": "Select the entity type to work with",
+      "enum": ["passes", "members", "venues", "organizations", "campaigns"],
+      "propertyOrder": 3,
+      "options": {
+        "dependencies": {
+          "action": "write"
+        }
+      }
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operation",
+      "description": "Select the operation to perform on the chosen entity",
+      "propertyOrder": 4,
+      "options": {
+        "dependencies": {
+          "action": "write"
+        }
+      }
     },
     "batch_size": {
       "type": "integer",
@@ -50,27 +48,34 @@
       "default": 50,
       "minimum": 1,
       "maximum": 100,
-      "propertyOrder": 3
+      "propertyOrder": 5,
+      "options": {
+        "dependencies": {
+          "action": "write"
+        }
+      }
     },
     "message_header": {
       "type": "string",
       "title": "Notification Header",
-      "description": "Push notification header text (for campaign actions)",
+      "description": "Push notification header text",
       "propertyOrder": 10,
       "options": {
         "dependencies": {
-          "action": ["create_passes_campaign", "create_template_campaign"]
+          "action": "write",
+          "entity": "campaigns"
         }
       }
     },
     "message_body": {
       "type": "string",
       "title": "Notification Body",
-      "description": "Push notification body text (required for campaign actions)",
+      "description": "Push notification body text (required for campaign creation)",
       "propertyOrder": 11,
       "options": {
         "dependencies": {
-          "action": ["create_passes_campaign", "create_template_campaign"]
+          "action": "write",
+          "entity": "campaigns"
         }
       }
     },
@@ -84,7 +89,8 @@
       "propertyOrder": 12,
       "options": {
         "dependencies": {
-          "action": "create_template_campaign"
+          "action": "write",
+          "entity": "campaigns"
         }
       }
     },
@@ -95,7 +101,8 @@
       "propertyOrder": 13,
       "options": {
         "dependencies": {
-          "action": ["create_passes_campaign", "create_template_campaign"]
+          "action": "write",
+          "entity": "campaigns"
         }
       }
     },
@@ -106,7 +113,8 @@
       "propertyOrder": 14,
       "options": {
         "dependencies": {
-          "action": ["create_passes_campaign", "create_template_campaign"]
+          "action": "write",
+          "entity": "campaigns"
         }
       }
     }
