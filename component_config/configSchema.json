@@ -1,0 +1,114 @@
+{
+  "type": "object",
+  "title": "Tiketo Pass Manager Configuration",
+  "required": ["#token", "action"],
+  "properties": {
+    "#token": {
+      "type": "string",
+      "title": "API Token",
+      "description": "Your Tiketo CMS API token",
+      "format": "password",
+      "propertyOrder": 1
+    },
+    "action": {
+      "type": "string",
+      "title": "Action",
+      "description": "Select the action to perform",
+      "enum": [
+        "list_templates",
+        "list_passes",
+        "list_members",
+        "list_venues",
+        "list_organizations",
+        "list_campaigns",
+        "upsert_passes",
+        "delete_passes",
+        "upsert_members",
+        "delete_members",
+        "upsert_venues",
+        "delete_venues",
+        "add_venue_members",
+        "remove_venue_members",
+        "upsert_organizations",
+        "delete_organizations",
+        "move_organizations",
+        "add_organization_members",
+        "remove_organization_members",
+        "update_organization_member_roles",
+        "attach_entities_to_organizations",
+        "detach_entities_from_organizations",
+        "create_passes_campaign",
+        "create_template_campaign",
+        "archive_campaigns"
+      ],
+      "propertyOrder": 2
+    },
+    "batch_size": {
+      "type": "integer",
+      "title": "Batch Size",
+      "description": "Number of items to process per API request (1-100)",
+      "default": 50,
+      "minimum": 1,
+      "maximum": 100,
+      "propertyOrder": 3
+    },
+    "message_header": {
+      "type": "string",
+      "title": "Notification Header",
+      "description": "Push notification header text (for campaign actions)",
+      "propertyOrder": 10,
+      "options": {
+        "dependencies": {
+          "action": ["create_passes_campaign", "create_template_campaign"]
+        }
+      }
+    },
+    "message_body": {
+      "type": "string",
+      "title": "Notification Body",
+      "description": "Push notification body text (required for campaign actions)",
+      "propertyOrder": 11,
+      "options": {
+        "dependencies": {
+          "action": ["create_passes_campaign", "create_template_campaign"]
+        }
+      }
+    },
+    "template_ids": {
+      "type": "array",
+      "title": "Template IDs",
+      "description": "Template IDs to target with template campaign",
+      "items": {
+        "type": "string"
+      },
+      "propertyOrder": 12,
+      "options": {
+        "dependencies": {
+          "action": "create_template_campaign"
+        }
+      }
+    },
+    "date_from": {
+      "type": "string",
+      "title": "Campaign Start Date",
+      "description": "Campaign start date (ISO format, optional)",
+      "propertyOrder": 13,
+      "options": {
+        "dependencies": {
+          "action": ["create_passes_campaign", "create_template_campaign"]
+        }
+      }
+    },
+    "date_to": {
+      "type": "string",
+      "title": "Campaign End Date",
+      "description": "Campaign end date (ISO format, optional)",
+      "propertyOrder": 14,
+      "options": {
+        "dependencies": {
+          "action": ["create_passes_campaign", "create_template_campaign"]
+        }
+      }
+    }
+  }
+}

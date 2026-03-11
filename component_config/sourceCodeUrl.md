@@ -1,0 +1,1 @@
+https://github.com/kbcMichal/app-tiketo-pass-manager

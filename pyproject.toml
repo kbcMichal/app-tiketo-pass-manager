@@ -1,19 +1,14 @@
 [project]
 name = "tiketo-pass-manager"
-version = "0.1.0"
-description = "Keboola component for managing Tiketo digital passes"
-requires-python = ">=3.9"
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.12"
 dependencies = [
-    "keboola.component>=1.0.0",
+    "flake8>=7.2.0",
+    "keboola-component>=1.6.10",
+    "mock>=5.2.0",
     "requests>=2.31.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "ruff>=0.4.0",
-    "pytest>=8.0.0",
-    "pytest-cov>=5.0.0",
-    "responses>=0.25.0",
+    "ruff>=0.11.0",
 ]
 
 [tool.ruff]
@@ -22,6 +17,3 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

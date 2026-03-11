@@ -1,0 +1,1 @@
+Provide your Tiketo API token and select an action to perform. Extract actions fetch data from Tiketo into Keboola tables. Write actions read from input tables and push data to Tiketo.

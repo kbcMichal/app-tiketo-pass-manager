@@ -1,0 +1,1 @@
+Keboola component for full integration with the Tiketo CMS API. Manages digital passes (Apple Wallet, Google Wallet), members, venues, organizations, and push notification campaigns via GraphQL API. Supports extraction of all entity types and batch write operations.
