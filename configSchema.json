@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "title": "Tiketo Pass Manager Configuration",
+  "required": ["#token", "action"],
+  "properties": {
+    "#token": {
+      "type": "string",
+      "title": "API Token",
+      "description": "Your Tiketo CMS API token",
+      "format": "password",
+      "propertyOrder": 1
+    },
+    "action": {
+      "type": "string",
+      "title": "Action",
+      "description": "Select the action to perform",
+      "enum": ["list_templates", "upsert_passes"],
+      "propertyOrder": 2
+    },
+    "template_id": {
+      "type": "string",
+      "title": "Template ID",
+      "description": "The pass template ID to use for upserting passes",
+      "propertyOrder": 3,
+      "options": {
+        "dependencies": {
+          "action": "upsert_passes"
+        }
+      }
+    },
+    "batch_size": {
+      "type": "integer",
+      "title": "Batch Size",
+      "description": "Number of passes to upsert per API request (1-100)",
+      "default": 50,
+      "minimum": 1,
+      "maximum": 100,
+      "propertyOrder": 4,
+      "options": {
+        "dependencies": {
+          "action": "upsert_passes"
+        }
+      }
+    }
+  }
+}

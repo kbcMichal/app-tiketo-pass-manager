@@ -1,0 +1,6 @@
+{
+  "parameters": {
+    "#token": "YOUR_TIKETO_TOKEN",
+    "action": "list_templates"
+  }
+}
