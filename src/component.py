@@ -130,7 +130,10 @@ class Component(CommonInterface):
                 out_path = Path(self.tables_out_path) / filename
                 self._write_csv(out_path, records, fields or [])
                 table_def = self.create_out_table_definition(
-                    filename, primary_key=["id"], incremental=True
+                    filename,
+                    destination=f"out.c-tiketo.{name}",
+                    primary_key=["id"],
+                    incremental=True,
                 )
                 self.write_manifest(table_def)
             else:
@@ -408,8 +411,12 @@ class Component(CommonInterface):
         records = self._serialize_nested_fields(records)
         out_path = Path(self.tables_out_path) / filename
         self._write_csv(out_path, records, fields)
+        table_name = filename.replace(".csv", "")
         table_def = self.create_out_table_definition(
-            filename, primary_key=["id"], incremental=True
+            filename,
+            destination=f"out.c-tiketo.{table_name}",
+            primary_key=["id"],
+            incremental=True,
         )
         self.write_manifest(table_def)
 
