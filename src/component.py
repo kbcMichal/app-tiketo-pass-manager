@@ -103,16 +103,23 @@ class Component(CommonInterface):
         """Extract all entity types from Tiketo into output tables."""
         assert self.client is not None
 
+        # (name, fixed_fields, fetch_fn, transform_fn, json_expand_map)
+        # json_expand_map: {field_name: prefix} — parse JSON field into prefix_key columns
         extract_tasks = [
-            ("templates", ["id", "name"], self.client.get_pass_templates, None),
-            ("passes", None, self.client.get_passes, self._flatten_passes),
-            ("members", None, self.client.get_members, None),
-            ("venues", None, self.client.get_venues, None),
-            ("organizations", None, self.client.get_organizations, None),
-            ("campaigns", None, self.client.get_campaigns, None),
+            ("templates", ["id", "name"], self.client.get_pass_templates, None, {}),
+            ("passes", None, self.client.get_passes, self._flatten_passes,
+             {"parameters": "param"}),
+            ("members", None, self.client.get_members, None,
+             {"metadata": "meta"}),
+            ("venues", None, self.client.get_venues, None,
+             {"address": "address", "metadata": "meta"}),
+            ("organizations", None, self.client.get_organizations, None,
+             {"metadata": "meta"}),
+            ("campaigns", None, self.client.get_campaigns, None,
+             {"metadata": "meta"}),
         ]
 
-        for name, fields, fetch_fn, transform_fn in extract_tasks:
+        for name, fields, fetch_fn, transform_fn, json_expand in extract_tasks:
             logging.info("Extracting %s...", name)
             records = fetch_fn()
             logging.info("Found %d %s.", len(records), name)
@@ -120,10 +127,13 @@ class Component(CommonInterface):
             if transform_fn:
                 records = transform_fn(records)
 
-            records = self._serialize_nested_fields(records)
+            if json_expand:
+                records = self._expand_json_fields(records, json_expand)
+            else:
+                records = self._serialize_nested_fields(records)
 
             if not fields and records:
-                fields = list(records[0].keys())
+                fields = self._collect_all_keys(records)
 
             if records:
                 filename = f"{name}.csv"
@@ -435,13 +445,65 @@ class Component(CommonInterface):
         return [TiketoClient._flatten_pass(r) for r in records]
 
     @staticmethod
+    def _expand_json_fields(records: list[dict], expand_map: dict[str, str]) -> list[dict]:
+        """Parse JSON/dict fields and expand them into prefixed columns.
+
+        Args:
+            records: List of record dicts.
+            expand_map: {field_name: prefix} — e.g. {"parameters": "param"}.
+                The field is removed and replaced with prefix_key columns.
+        """
+        result: list[dict] = []
+        for record in records:
+            row: dict = {}
+            for k, v in record.items():
+                if k in expand_map:
+                    prefix = expand_map[k]
+                    parsed = Component._parse_json_value(v)
+                    if isinstance(parsed, dict):
+                        for sub_key, sub_val in parsed.items():
+                            col_name = f"{prefix}_{sub_key}"
+                            row[col_name] = sub_val if sub_val is not None else ""
+                    # If not a dict (or empty), skip — don't keep raw JSON
+                elif isinstance(v, (dict, list)):
+                    row[k] = json.dumps(v)
+                elif v is None:
+                    row[k] = ""
+                else:
+                    row[k] = v
+            result.append(row)
+        return result
+
+    @staticmethod
+    def _parse_json_value(v: object) -> object:
+        """Parse a value that might be a JSON string or already a dict."""
+        if isinstance(v, dict):
+            return v
+        if isinstance(v, str) and v.strip().startswith("{"):
+            try:
+                return json.loads(v)
+            except (json.JSONDecodeError, ValueError):
+                return v
+        return v
+
+    @staticmethod
+    def _collect_all_keys(records: list[dict]) -> list[str]:
+        """Collect all unique keys across records, preserving insertion order."""
+        seen: dict[str, None] = {}
+        for record in records:
+            for k in record:
+                if k not in seen:
+                    seen[k] = None
+        return list(seen.keys())
+
+    @staticmethod
     def _write_csv(out_path: Path, records: list[dict], fields: list[str]) -> None:
         """Write records to a CSV file."""
         with open(out_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
             for record in records:
-                writer.writerow(record)
+                writer.writerow({k: record.get(k, "") for k in fields})
 
     @staticmethod
     def _serialize_nested_fields(records: list[dict]) -> list[dict]:
