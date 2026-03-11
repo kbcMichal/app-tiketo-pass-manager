@@ -299,7 +299,7 @@ class Component(CommonInterface):
             if not row.get("venue_id") or not row.get("member_id"):
                 raise ValueError("Input table must have 'venue_id' and 'member_id' columns.")
             logging.info("%s member %s to/from venue %s", action_word, row["member_id"], row["venue_id"])
-            result = fn(row["venue_id"], row["member_id"])
+            fn(row["venue_id"], row["member_id"])
             results.append({"venue_id": row["venue_id"], "member_id": row["member_id"], "status": "ok"})
         self._write_output("venue_members_result.csv", results, ["venue_id", "member_id", "status"])
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 import requests
 
@@ -364,7 +364,9 @@ class TiketoClient:
         """Attach an entity to an organization."""
         mutation = f"""
         mutation {{
-            attachEntityToOrganization(input: {{organizationId: "{org_id}", entityType: {entity_type}, entityId: "{entity_id}"}}) {{
+            attachEntityToOrganization(input: {{
+                organizationId: "{org_id}", entityType: {entity_type}, entityId: "{entity_id}"
+            }}) {{
                 organizationId
             }}
         }}
@@ -376,7 +378,9 @@ class TiketoClient:
         """Detach an entity from an organization."""
         mutation = f"""
         mutation {{
-            detachEntityFromOrganization(input: {{organizationId: "{org_id}", entityType: {entity_type}, entityId: "{entity_id}"}})
+            detachEntityFromOrganization(input: {{
+                organizationId: "{org_id}", entityType: {entity_type}, entityId: "{entity_id}"
+            }})
         }}
         """
         data = self._execute(mutation)
@@ -485,8 +489,8 @@ class TiketoClient:
         parts: list[str] = []
         if m.get("id"):
             parts.append(f'id: "{m["id"]}"')
-        for field in ["email", "phone", "externalId", "external_id", "firstName", "first_name",
-                       "lastName", "last_name"]:
+        for field in ["email", "phone", "externalId", "external_id",
+                      "firstName", "first_name", "lastName", "last_name"]:
             # Support both camelCase and snake_case
             camel = field
             if "_" in field:
